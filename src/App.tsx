@@ -752,7 +752,18 @@ export default function App() {
                     className="bg-[#FFC000] px-8 py-12 rounded-[2.5rem] shadow-[0_20px_40px_rgba(255,192,0,0.2)] w-full max-w-[320px] relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
-                    <h2 className="text-4xl sm:text-5xl font-black text-[#0B0D14] tracking-tight mb-4 relative z-10">
+                    <h2 
+                      lang="de"
+                      className={`font-black text-[#0B0D14] tracking-tight mb-4 relative z-10 w-full break-words hyphens-auto ${
+                        currentWords[currentIndex].german.length > 16 
+                          ? 'text-xl sm:text-2xl' 
+                          : currentWords[currentIndex].german.length > 12 
+                            ? 'text-2xl sm:text-3xl' 
+                            : currentWords[currentIndex].german.length > 9
+                              ? 'text-3xl sm:text-4xl'
+                              : 'text-4xl sm:text-5xl'
+                      }`}
+                    >
                       {currentWords[currentIndex].german}
                     </h2>
                     <p className="text-lg sm:text-xl text-[#0B0D14]/70 font-bold relative z-10">
@@ -819,9 +830,9 @@ export default function App() {
                   <ul className="space-y-3 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
                     {mistakes.map(m => (
                       <li key={m.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#0B0D14] p-4 rounded-2xl border border-slate-800/50 gap-3">
-                        <span className="text-slate-300 font-bold text-lg">{m.german}</span>
-                        <ArrowRight className="w-4 h-4 text-slate-600 hidden sm:block" />
-                        <span className="text-[#0B0D14] font-black bg-[#FFC000] px-4 py-2 rounded-xl text-center text-sm">
+                        <span className="text-slate-300 font-bold text-lg break-words hyphens-auto" lang="de">{m.german}</span>
+                        <ArrowRight className="w-4 h-4 text-slate-600 hidden sm:block shrink-0" />
+                        <span className="text-[#0B0D14] font-black bg-[#FFC000] px-4 py-2 rounded-xl text-center text-sm break-words hyphens-auto" lang="de">
                           {m.article} {m.german}
                         </span>
                       </li>
