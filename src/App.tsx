@@ -572,7 +572,7 @@ export default function App() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="text-slate-300 leading-relaxed font-medium relative z-10"
               >
-                En Allemagne, le genre est un réflexe, pas une réflexion. Ce timer de 60 secondes vous entraîne à décider instantanément.
+                En allemand, le genre est un réflexe, pas une réflexion. Ce timer de 60 secondes vous entraîne à décider instantanément.
               </motion.p>
 
               <div className="space-y-5 relative z-10">
