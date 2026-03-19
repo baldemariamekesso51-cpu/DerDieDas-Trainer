@@ -563,7 +563,7 @@ export default function App() {
                   DerDieDas <br/>
                   <span className="text-[#FFC000]">Trainer</span>
                 </h1>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Votre Réflexe pour DerDieDas</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Votre Réflexe pour Der Die Das</p>
               </motion.div>
 
               <motion.p 
