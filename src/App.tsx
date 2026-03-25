@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Play, RotateCcw, Home, BookOpen, Zap, Target, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Play, RotateCcw, Home, BookOpen, Zap, Target, ArrowRight, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 
 type Article = 'der' | 'die' | 'das';
 
@@ -376,11 +376,27 @@ export default function App() {
   const [mistakes, setMistakes] = useState<VocabItem[]>([]);
 
   const [isMuted, setIsMuted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const isMutedRef = useRef(isMuted);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   const playTick = () => {
     if (isMutedRef.current) return;
@@ -503,13 +519,13 @@ export default function App() {
   const portions = getPortions(lessonWords.length, wordsPerGame);
 
   const bgColor = feedback === 'correct' 
-    ? 'bg-emerald-950/40' 
+    ? (isDarkMode ? 'bg-emerald-950/40' : 'bg-emerald-100')
     : feedback === 'incorrect' 
-      ? 'bg-red-950/40' 
-      : 'bg-[#0B0D14]';
+      ? (isDarkMode ? 'bg-red-950/40' : 'bg-red-100')
+      : (isDarkMode ? 'bg-[#0B0D14]' : 'bg-slate-50');
 
   return (
-    <div className={`min-h-screen w-full flex flex-col items-center p-4 transition-colors duration-300 ${bgColor} font-sans text-white`}>
+    <div className={`min-h-screen w-full flex flex-col items-center p-4 transition-colors duration-300 ${bgColor} font-sans text-slate-900 dark:text-white`}>
       <div className="w-full max-w-md flex-1 flex flex-col">
         {/* Global Header */}
         <div className="w-full flex justify-between items-center mb-4 min-h-[48px] pt-2">
@@ -519,7 +535,7 @@ export default function App() {
                 setTimerActive(false);
                 setGameState('menu');
               }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#151822] hover:bg-[#1A1D28] rounded-full border border-slate-800 shadow-sm text-slate-300 font-bold transition-all active:scale-95"
+              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-[#151822] hover:bg-slate-100 dark:hover:bg-[#1A1D28] rounded-full border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-300 font-bold transition-all active:scale-95"
             >
               <Home className="w-5 h-5 text-[#FFC000]" />
               Menu
@@ -528,13 +544,22 @@ export default function App() {
             <div></div>
           )}
 
-          <button
-            onClick={() => setIsMuted(!isMuted)}
-            className="flex items-center justify-center w-11 h-11 bg-[#151822] hover:bg-[#1A1D28] rounded-full border border-slate-800 shadow-sm text-slate-300 transition-all active:scale-95"
-            title={isMuted ? "Activer le son" : "Désactiver le son"}
-          >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-[#FFC000]" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="flex items-center justify-center w-11 h-11 bg-white dark:bg-[#151822] hover:bg-slate-100 dark:hover:bg-[#1A1D28] rounded-full border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              title={isDarkMode ? "Passer au mode clair" : "Passer au mode sombre"}
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className="flex items-center justify-center w-11 h-11 bg-white dark:bg-[#151822] hover:bg-slate-100 dark:hover:bg-[#1A1D28] rounded-full border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              title={isMuted ? "Activer le son" : "Désactiver le son"}
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-[#FFC000]" />}
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center w-full pb-8">
@@ -543,7 +568,7 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="w-full bg-[#151822] rounded-[2rem] shadow-2xl border border-slate-800/50 p-8 space-y-8 relative overflow-hidden"
+              className="w-full bg-white dark:bg-[#151822] rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800/50 p-8 space-y-8 relative overflow-hidden"
             >
               {/* Decorative glow */}
               <motion.div 
@@ -559,18 +584,18 @@ export default function App() {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="space-y-3 relative z-10"
               >
-                <h1 className="text-4xl font-extrabold text-white tracking-tight leading-tight">
+                <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
                   DerDieDas <br/>
                   <span className="text-[#FFC000]">Trainer</span>
                 </h1>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Votre Réflexe pour Der Die Das</p>
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Votre Réflexe pour Der Die Das</p>
               </motion.div>
 
               <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="text-slate-300 leading-relaxed font-medium relative z-10"
+                className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium relative z-10"
               >
                 En allemand, le genre est un réflexe, pas une réflexion. Ce timer de 60 secondes vous entraîne à décider instantanément.
               </motion.p>
@@ -591,7 +616,7 @@ export default function App() {
                     <div className="bg-[#FFC000]/10 p-3 rounded-2xl text-[#FFC000] shrink-0">
                       <item.icon className="w-6 h-6" />
                     </div>
-                    <p className="text-slate-300 font-medium pt-1">{item.text}</p>
+                    <p className="text-slate-700 dark:text-slate-300 font-medium pt-1">{item.text}</p>
                   </motion.div>
                 ))}
               </div>
@@ -620,15 +645,15 @@ export default function App() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-[#FFC000]/10 text-[#FFC000] mb-4">
                   <Zap className="w-8 h-8" />
                 </div>
-                <h1 className="text-4xl font-extrabold text-white tracking-tight">DerDieDas</h1>
+                <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">DerDieDas</h1>
                 <p className="text-sm text-[#FFC000] font-bold uppercase tracking-widest">Trainer</p>
               </div>
 
-              <div className="bg-[#151822] rounded-[2rem] p-6 border border-slate-800/50 space-y-6 shadow-xl">
+              <div className="bg-white dark:bg-[#151822] rounded-[2rem] p-6 border border-slate-200 dark:border-slate-800/50 space-y-6 shadow-xl">
                 <div className="space-y-3">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider pl-2">Choisir une leçon</label>
+                  <label className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-2">Choisir une leçon</label>
                   <select 
-                    className="w-full p-4 bg-[#0B0D14] border border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-[#0B0D14] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-slate-900 dark:text-white"
                     value={selectedLesson}
                     onChange={(e) => {
                       setSelectedLesson(Number(e.target.value));
@@ -642,9 +667,9 @@ export default function App() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider pl-2">Chronomètre</label>
+                  <label className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-2">Chronomètre</label>
                   <select
-                    className="w-full p-4 bg-[#0B0D14] border border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-[#0B0D14] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-slate-900 dark:text-white"
                     value={timerDuration}
                     onChange={(e) => setTimerDuration(e.target.value === 'infinite' ? 'infinite' : Number(e.target.value))}
                   >
@@ -656,9 +681,9 @@ export default function App() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider pl-2">Mots par partie</label>
+                  <label className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-2">Mots par partie</label>
                   <select
-                    className="w-full p-4 bg-[#0B0D14] border border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-[#0B0D14] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-slate-900 dark:text-white"
                     value={wordsPerGame}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -676,9 +701,9 @@ export default function App() {
 
                 {portions.length > 0 && (
                   <div className="space-y-3">
-                    <label className="text-sm font-bold text-slate-400 uppercase tracking-wider pl-2">Portion ({lessonWords.length} mots)</label>
+                    <label className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-2">Portion ({lessonWords.length} mots)</label>
                     <select
-                      className="w-full p-4 bg-[#0B0D14] border border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-white"
+                      className="w-full p-4 bg-slate-50 dark:bg-[#0B0D14] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-[#FFC000] focus:border-[#FFC000] outline-none transition-all appearance-none font-medium text-slate-900 dark:text-white"
                       value={selectedPortion === 'all' ? 'all' : `${selectedPortion.start}-${selectedPortion.end}`}
                       onChange={(e) => {
                         if (e.target.value === 'all') setSelectedPortion('all');
@@ -724,13 +749,13 @@ export default function App() {
                       {timerDuration === 'infinite' ? timeElapsed : timeRemaining}<span className="text-3xl opacity-50 ml-1">s</span>
                     </div>
                   </div>
-                  <div className="text-sm font-bold text-slate-300 bg-[#151822] px-5 py-2.5 rounded-full border border-slate-800 mt-4">
+                  <div className="text-sm font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-[#151822] px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 mt-4">
                     {currentIndex + 1} / {currentWords.length}
                   </div>
                 </div>
             
                 {/* Progress Bar */}
-                <div className="h-2 w-full bg-[#151822] rounded-full overflow-hidden border border-slate-800/50">
+                <div className="h-2 w-full bg-slate-200 dark:bg-[#151822] rounded-full overflow-hidden border border-slate-300 dark:border-slate-800/50">
                   <motion.div 
                     className="h-full bg-[#FFC000]"
                     initial={{ width: 0 }}
@@ -778,21 +803,21 @@ export default function App() {
                 <button 
                   onClick={() => handleAnswer('der')}
                   disabled={feedback !== null}
-                  className="py-6 rounded-[2rem] bg-[#151822] border border-slate-700 hover:border-blue-500 hover:bg-blue-500/10 text-blue-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
+                  className="py-6 rounded-[2rem] bg-white dark:bg-[#151822] border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-500 dark:text-blue-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
                 >
                   DER
                 </button>
                 <button 
                   onClick={() => handleAnswer('die')}
                   disabled={feedback !== null}
-                  className="py-6 rounded-[2rem] bg-[#151822] border border-slate-700 hover:border-pink-500 hover:bg-pink-500/10 text-pink-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
+                  className="py-6 rounded-[2rem] bg-white dark:bg-[#151822] border border-slate-200 dark:border-slate-700 hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10 text-pink-500 dark:text-pink-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
                 >
                   DIE
                 </button>
                 <button 
                   onClick={() => handleAnswer('das')}
                   disabled={feedback !== null}
-                  className="py-6 rounded-[2rem] bg-[#151822] border border-slate-700 hover:border-emerald-500 hover:bg-emerald-500/10 text-emerald-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
+                  className="py-6 rounded-[2rem] bg-white dark:bg-[#151822] border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 font-black text-xl transition-all active:scale-95 disabled:opacity-90"
                 >
                   DAS
                 </button>
@@ -803,7 +828,7 @@ export default function App() {
           {gameState === 'results' && (
             <div className="w-full space-y-6">
               <div className="text-center space-y-2 mb-8">
-                <h2 className="text-4xl font-black text-white">Terminé</h2>
+                <h2 className="text-4xl font-black text-slate-900 dark:text-white">Terminé</h2>
                 <p className="text-[#FFC000] font-bold">
                   {score === currentWords.length ? "Parfait ! 🎉" : "Voici vos résultats"}
                 </p>
@@ -815,23 +840,23 @@ export default function App() {
                   <div className="text-xs text-[#0B0D14]/70 font-black mb-1 uppercase tracking-widest relative z-10">Score</div>
                   <div className="text-5xl font-black text-[#0B0D14] relative z-10">{score} <span className="text-2xl text-[#0B0D14]/50">/ {currentWords.length}</span></div>
                 </div>
-                <div className="bg-white p-6 rounded-[2rem] shadow-[0_10px_30px_rgba(255,255,255,0.1)] relative overflow-hidden">
-                  <div className="text-xs text-slate-400 font-black mb-1 uppercase tracking-widest relative z-10">Temps</div>
-                  <div className="text-5xl font-black text-[#0B0D14] relative z-10">{timeElapsed}s</div>
+                <div className="bg-white dark:bg-[#151822] p-6 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.02)] relative overflow-hidden">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-black mb-1 uppercase tracking-widest relative z-10">Temps</div>
+                  <div className="text-5xl font-black text-slate-900 dark:text-white relative z-10">{timeElapsed}s</div>
                 </div>
               </div>
 
               {mistakes.length > 0 && (
-                <div className="text-left space-y-4 bg-[#151822] p-6 rounded-[2rem] border border-slate-800 mt-8">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Target className="w-5 h-5 text-red-400" />
+                <div className="text-left space-y-4 bg-white dark:bg-[#151822] p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 mt-8 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Target className="w-5 h-5 text-red-500 dark:text-red-400" />
                     À réviser
                   </h3>
                   <ul className="space-y-3 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
                     {mistakes.map(m => (
-                      <li key={m.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#0B0D14] p-4 rounded-2xl border border-slate-800/50 gap-3">
-                        <span className="text-slate-300 font-bold text-lg break-words hyphens-auto" lang="de">{m.german}</span>
-                        <ArrowRight className="w-4 h-4 text-slate-600 hidden sm:block shrink-0" />
+                      <li key={m.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 dark:bg-[#0B0D14] p-4 rounded-2xl border border-slate-200 dark:border-slate-800/50 gap-3">
+                        <span className="text-slate-700 dark:text-slate-300 font-bold text-lg break-words hyphens-auto" lang="de">{m.german}</span>
+                        <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-600 hidden sm:block shrink-0" />
                         <span className="text-[#0B0D14] font-black bg-[#FFC000] px-4 py-2 rounded-xl text-center text-sm break-words hyphens-auto" lang="de">
                           {m.article} {m.german}
                         </span>
@@ -853,7 +878,7 @@ export default function App() {
                 )}
                 <button 
                   onClick={() => startGame()}
-                  className={`w-full py-4 ${mistakes.length > 0 ? 'bg-[#151822] text-white border border-slate-700' : 'bg-[#FFC000] text-[#0B0D14] shadow-[0_0_20px_rgba(255,192,0,0.2)]'} rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.98]`}
+                  className={`w-full py-4 ${mistakes.length > 0 ? 'bg-white dark:bg-[#151822] text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#1A1D28]' : 'bg-[#FFC000] hover:bg-[#FFD040] text-[#0B0D14] shadow-[0_0_20px_rgba(255,192,0,0.2)]'} rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.98]`}
                 >
                   <RotateCcw className="w-5 h-5" />
                   Rejouer la portion
